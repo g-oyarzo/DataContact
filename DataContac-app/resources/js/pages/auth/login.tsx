@@ -15,6 +15,7 @@ import { request } from '@/routes/password';
 type Props = {
     status?: string;
     canResetPassword: boolean;
+    
 };
 
 export default function Login({ status, canResetPassword }: Props) {
@@ -24,7 +25,7 @@ export default function Login({ status, canResetPassword }: Props) {
 
             <PasskeyVerify />
 
-            <Form
+            <Form 
                 {...store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
@@ -71,7 +72,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-3 ">
                                 <Checkbox
                                     id="remember"
                                     name="remember"

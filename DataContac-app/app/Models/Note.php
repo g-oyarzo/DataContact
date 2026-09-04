@@ -15,11 +15,6 @@ class Note extends Model
         'content',
     ];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
