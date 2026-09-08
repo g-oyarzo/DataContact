@@ -14,7 +14,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { store } from '@/routes/contacts';
 import type { BreadcrumbItem } from '@/types';
 
 interface Company {
@@ -55,7 +54,11 @@ function CreateContact({ companies, tags }: Props) {
                     </h1>
                 </div>
 
-                <Form {...store.form()} className="flex flex-col gap-6">
+                <Form
+                    action="/contacts"
+                    method="post"
+                    className="flex flex-col gap-6"
+                >
                     {({ processing, errors }) => (
                         <>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, FolderGit2, LayoutGrid, LeafIcon, Tag, Users } from 'lucide-react';
+import { Building2, LayoutGrid, StickyNote, Tag, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -42,7 +42,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Notes',
         href: '/notes',
-        icon: BookOpen,
+        icon: StickyNote,
     },
 ];
 

@@ -1,13 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { HelpCircle, Plus, Search, UploadCloud, UserPlus } from 'lucide-react';
+import { Eye, HelpCircle, Pencil, Plus, Search, Trash2, UploadCloud, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { BreadcrumbItem } from '@/types';
-
-
 
 interface Tag {
     id: number;
@@ -46,7 +44,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Contactos', href: '/contacts' },
 ];
 
-export default function ContactsIndex({ contacts }: Props) {
+function ContactsIndex({ contacts }: Props) {
     const [search, setSearch] = useState('');
 
     function handleSearch(e: React.FormEvent) {
@@ -54,11 +52,20 @@ export default function ContactsIndex({ contacts }: Props) {
         router.get('/contacts', { search }, { preserveState: true, replace: true });
     }
 
+    function handleDelete(e: React.MouseEvent, id: number, name: string) {
+        e.stopPropagation();
+
+        if (confirm(`¿Eliminar a ${name}? Esta acción no se puede deshacer.`)) {
+            router.delete(`/contacts/${id}`, { preserveScroll: true });
+        }
+    }
+
     return (
         <>
             <Head title="Contactos" />
+
             <div className="flex flex-col gap-6 p-4 md:p-6">
-                {/* Barra de búsqueda superior */}
+                {/* Barra de búsqueda */}
                 <form onSubmit={handleSearch}>
                     <div className="relative">
                         <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -111,6 +118,7 @@ export default function ContactsIndex({ contacts }: Props) {
                                     <th className="px-4 py-3 font-medium">Empresa</th>
                                     <th className="px-4 py-3 font-medium">Email</th>
                                     <th className="px-4 py-3 font-medium">Etiquetas</th>
+                                    <th className="px-4 py-3 font-medium text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -138,6 +146,46 @@ export default function ContactsIndex({ contacts }: Props) {
                                                 ))}
                                             </div>
                                         </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-8"
+                                                    asChild
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <Link href={`/contacts/${contact.id}`}>
+                                                        <Eye className="size-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-8"
+                                                    asChild
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <Link href={`/contacts/${contact.id}/edit`}>
+                                                        <Pencil className="size-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-8 text-destructive hover:text-destructive"
+                                                    onClick={(e) =>
+                                                        handleDelete(
+                                                            e,
+                                                            contact.id,
+                                                            `${contact.first_name} ${contact.last_name}`
+                                                        )
+                                                    }
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </Button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -149,38 +197,41 @@ export default function ContactsIndex({ contacts }: Props) {
                 {contacts.last_page > 1 && (
                     <div className="flex flex-wrap items-center justify-center gap-1">
                         {contacts.links.map((link, i) => (
-                            <Link
+                            <Button
                                 key={i}
-                                href={link.url ?? '#'}
-                                preserveState
-                                className={`rounded-md px-3 py-1.5 text-sm transition ${
-                                    link.active
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'text-muted-foreground hover:bg-muted'
-                                } ${!link.url ? 'pointer-events-none opacity-40' : ''}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
+                                variant={link.active ? 'default' : 'ghost'}
+                                size="sm"
+                                disabled={!link.url}
+                                asChild={!!link.url}
+                            >
+                                {link.url ? (
+                                    <Link
+                                        href={link.url}
+                                        preserveState
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                    />
+                                ) : (
+                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                )}
+                            </Button>
                         ))}
                     </div>
                 )}
             </div>
         </>
-    ); 
+    );
 }
 
 function EmptyState() {
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col items-center gap-6 rounded-lg border border-border bg-card px-6 py-16 text-center">
-                {/* Icono */}
                 <div className="relative flex size-20 items-center justify-center rounded-full bg-accent">
                     <UserPlus className="size-9 text-primary" />
                     <span className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
                         <Plus className="size-4" />
                     </span>
                 </div>
-
-                {/* Texto */}
                 <div className="max-w-sm">
                     <h2 className="text-xl font-semibold text-foreground">
                         No tenés ningún contacto agendado
@@ -191,8 +242,6 @@ function EmptyState() {
                         agenda de forma centralizada.
                     </p>
                 </div>
-
-                {/* Acciones */}
                 <div className="flex flex-wrap items-center justify-center gap-3">
                     <Button asChild>
                         <Link href="/contacts/create">
@@ -205,19 +254,16 @@ function EmptyState() {
                         Importar contactos
                     </Button>
                 </div>
-
                 <p className="text-xs text-muted-foreground">
                     Próximamente: compatibilidad con archivos .csv y .vcf
                 </p>
             </div>
 
-            {/* Sección de ayuda */}
             <div>
                 <div className="flex items-center gap-3 text-xs font-medium tracking-wide text-muted-foreground">
                     <span>COMENZAR CON DATACONTAC</span>
                     <span className="h-px flex-1 bg-border" />
                 </div>
-
                 <div className="mt-4 flex flex-col items-start justify-between gap-4 rounded-lg border border-border bg-card p-5 sm:flex-row sm:items-center">
                     <div className="flex items-start gap-3">
                         <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
@@ -241,7 +287,8 @@ function EmptyState() {
     );
 }
 
+ContactsIndex.layout = (page: React.ReactNode) => (
+    <AppLayout breadcrumbs={breadcrumbs}>{page}</AppLayout>
+);
 
-ContactsIndex.layout = {
-    breadcrumbs: breadcrumbs,
-};
+export default ContactsIndex;
